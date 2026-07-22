@@ -61,7 +61,7 @@ class PostmarkClient:
             json={
                 "From": settings.email_from,
                 "To": ", ".join(recipients),
-                "Subject": f"{len(flagged)} good first issue{'s' if len(flagged) != 1 else ''} found",
+                "Subject": f"OSS Notifier Agent: {len(flagged)} issues found",
                 "HtmlBody": html_body,
                 "MessageStream": "outbound",
             },
