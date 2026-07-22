@@ -27,6 +27,13 @@ class Settings(BaseSettings):
         # a generic name like MODEL in the user's shell can't silently change
         # the provider. Fields with an explicit validation_alias are exempt.
         env_prefix="AGENT_",
+        # notify.yml sets AGENT_MODEL: ${{ vars.AGENT_MODEL }} unconditionally;
+        # when that repo variable doesn't exist, GitHub Actions substitutes an
+        # empty string rather than omitting the key, so the env var is present
+        # but empty. Without this, pydantic-settings treats that as an explicit
+        # value ("") instead of falling back to the field default, and
+        # infer_model("") blows up with "Unknown model: ". Treat empty as unset.
+        env_ignore_empty=True,
     )
 
     # Provider API keys — required only for the provider of the selected model.
