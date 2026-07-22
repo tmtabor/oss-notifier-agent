@@ -1,26 +1,41 @@
 [
   {
-    "name": "basic_greeting",
-    "inputs": {"user_input": "Hello, how are you?"},
+    "name": "readme_typo",
+    "inputs": {
+      "user_input": "Repository: octocat/example-repo\nTitle: Fix typo in README\nLabels: good first issue\nURL: https://github.com/octocat/example-repo/issues/1\n\nBody:\nThe word 'recieve' on line 12 of README.md should be 'receive'."
+    },
+    "expected_output": true,
     "metadata": {
-      "expected_topics": ["greeting", "response"],
       "difficulty": "easy"
     }
   },
   {
-    "name": "factual_question",
-    "inputs": {"user_input": "What is the capital of France?"},
-    "expected_output": "Paris",
+    "name": "small_bug_clear_repro",
+    "inputs": {
+      "user_input": "Repository: octocat/example-repo\nTitle: Off-by-one error in pagination\nLabels: bug, good first issue\nURL: https://github.com/octocat/example-repo/issues/3\n\nBody:\nWhen requesting page 2 with page_size=10, the API returns items 21-30 instead of 11-20. The bug is in paginate() in utils/pagination.py, where the offset calculation uses `page * page_size` instead of `(page - 1) * page_size`."
+    },
+    "expected_output": true,
     "metadata": {
-      "expected_topics": ["geography", "factual"],
       "difficulty": "easy"
     }
   },
   {
-    "name": "complex_task",
-    "inputs": {"user_input": "Summarize the key benefits of async programming in Python."},
+    "name": "architecture_redesign",
+    "inputs": {
+      "user_input": "Repository: octocat/example-repo\nTitle: Redesign caching layer for better performance\nLabels: enhancement\nURL: https://github.com/octocat/example-repo/issues/2\n\nBody:\nOur current caching approach doesn't scale well under high concurrency. We should investigate alternative architectures such as a distributed cache with consistent hashing, potentially replacing the current LRU implementation across every subsystem that depends on it."
+    },
+    "expected_output": false,
     "metadata": {
-      "expected_topics": ["python", "async", "concurrency"],
+      "difficulty": "hard"
+    }
+  },
+  {
+    "name": "vague_feature_request",
+    "inputs": {
+      "user_input": "Repository: octocat/example-repo\nTitle: Improve performance\nLabels: enhancement\nURL: https://github.com/octocat/example-repo/issues/4\n\nBody:\nThe app feels slow sometimes. Can we make it faster?"
+    },
+    "expected_output": false,
+    "metadata": {
       "difficulty": "medium"
     }
   }

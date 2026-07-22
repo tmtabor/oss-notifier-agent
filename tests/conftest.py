@@ -9,6 +9,7 @@ import os
 # setdefault() leaves real keys untouched if they are present.
 os.environ.setdefault("ANTHROPIC_API_KEY", "unit-test-dummy-key")
 os.environ.setdefault("OPENAI_API_KEY", "unit-test-dummy-key")
+os.environ.setdefault("GOOGLE_API_KEY", "unit-test-dummy-key")
 
 import importlib  # noqa: E402
 import sys  # noqa: E402
