@@ -2,11 +2,14 @@ name: Good First Issue Digest
 
 on:
   schedule:
-    # Daily at 14:00 UTC = 7am Pacific Daylight Time (UTC-7). GitHub Actions
+    # Daily at 14:09 UTC = ~7am Pacific Daylight Time (UTC-7). GitHub Actions
     # cron is UTC-only with no DST support, so during Pacific Standard Time
-    # (UTC-8, roughly Nov-Mar) this actually runs at 6am Pacific instead of
+    # (UTC-8, roughly Nov-Mar) this actually runs at ~6am Pacific instead of
     # 7am — a one-hour drift twice a year, not something cron can fix.
-    - cron: "0 14 * * *"
+    # Minute is :09, not :00 — GitHub's own docs call out the top of the
+    # hour as a high-load period more prone to scheduling delay; we saw a
+    # ~1h45m delay on the very first scheduled run with "0 14 * * *".
+    - cron: "9 14 * * *"
   workflow_dispatch: {}
 
 permissions:

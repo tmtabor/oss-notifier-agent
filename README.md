@@ -55,10 +55,11 @@ public repo issues. `AGENT_MODEL` itself isn't sensitive; set it as a repo **var
 (Settings → Secrets and variables → Actions → Variables) if you want to override the default, or
 leave it unset.
 
-The schedule is a `cron:` trigger in `.github/workflows/notify.yml` (default: daily at 14:00 UTC,
-i.e. 6am Pacific Standard Time — GitHub Actions cron is UTC-only with no DST support, so this
-drifts to 7am Pacific during Pacific Daylight Time) — edit it directly in your fork if you want a
-different cadence. **`AGENT_SEARCH_WINDOW_HOURS` (default 25h) is not derived from the cron
+The schedule is a `cron:` trigger in `.github/workflows/notify.yml` (default: daily at 14:09 UTC,
+i.e. ~6am Pacific Standard Time — GitHub Actions cron is UTC-only with no DST support, so this
+drifts to ~7am Pacific during Pacific Daylight Time; the `:09` avoids the top-of-hour scheduling
+delay GitHub's own docs warn about) — edit it directly in your fork if you want a different
+cadence. **`AGENT_SEARCH_WINDOW_HOURS` (default 25h) is not derived from the cron
 schedule** — it's a separate, manually-set value. If you change the cron interval, update
 `AGENT_SEARCH_WINDOW_HOURS` to match (plus a small buffer): too small and issues created between
 runs are silently never searched.
