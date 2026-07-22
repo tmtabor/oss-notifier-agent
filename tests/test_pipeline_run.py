@@ -1,10 +1,24 @@
 """Unit tests for agent.pipeline.run — everything stubbed, no network, no real model calls."""
 
+import pytest
+
 from agent.agents import AgentOutput
 from agent.config import settings
 from agent.pipeline import run as run_module
 from agent.pipeline.config import PipelineConfig, RepoConfig
 from agent.pipeline.models import Issue
+
+
+@pytest.fixture(autouse=True)
+def no_real_sleep(monkeypatch):
+    """collect_issues() sleeps between repo searches to avoid GitHub Search API
+    rate limiting — skip the real delay so the test suite stays fast. The
+    dedicated test below overrides this with a call-counting spy instead."""
+    monkeypatch.setattr(run_module.asyncio, "sleep", lambda seconds: _noop())
+
+
+async def _noop():
+    return None
 
 
 def make_issue(repo: str, n: int) -> Issue:
@@ -53,6 +67,28 @@ async def test_collect_issues_tolerates_one_repo_failing(monkeypatch):
 
     assert len(issues) == 1
     assert issues[0].repo == "c/d"
+
+
+async def test_collect_issues_sleeps_between_repos_not_before_first(monkeypatch):
+    """Regression test: rapid back-to-back GitHub Search API requests with no
+    delay triggered 403s on 5 of 7 repos in production. There must be a delay
+    between consecutive searches, but not a wasted one before the first."""
+    monkeypatch.setattr(settings, "max_issues_per_run", 100)
+    sleep_calls = []
+
+    async def fake_sleep(seconds):
+        sleep_calls.append(seconds)
+
+    monkeypatch.setattr(run_module.asyncio, "sleep", fake_sleep)
+
+    config = PipelineConfig(
+        repositories=[RepoConfig(repo="a/b"), RepoConfig(repo="c/d"), RepoConfig(repo="e/f")]
+    )
+    github_client = FakeGithubClient({})
+
+    await run_module.collect_issues(config, github_client)
+
+    assert sleep_calls == [run_module.GITHUB_SEARCH_DELAY_SECONDS] * 2
 
 
 async def test_collect_issues_caps_at_max_issues_per_run(monkeypatch):

@@ -64,6 +64,19 @@ class GitHubIssuesClient:
             params={"q": query, "per_page": PER_PAGE},
             headers=self._headers(),
         )
+        if response.is_error:
+            # httpx.HTTPStatusError's default message doesn't include the
+            # response body, which is where GitHub explains *which* limit was
+            # hit (primary quota vs. secondary/abuse rate limit) — log it so a
+            # failure is actually diagnosable instead of just a bare stack trace.
+            logger.error(
+                "GitHub search request failed",
+                extra={
+                    "repo": repo_config.repo,
+                    "status_code": response.status_code,
+                    "response_body": response.text[:1000],
+                },
+            )
         response.raise_for_status()
         items = response.json().get("items", [])
 

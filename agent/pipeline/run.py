@@ -27,6 +27,15 @@ from agent.prompts.templates import render_issue_prompt
 
 logger = get_logger(__name__)
 
+# GitHub's Search API is much more prone to secondary (abuse) rate limiting
+# than the general REST API when hit with rapid consecutive requests, even
+# well under the documented per-minute quota — we saw 5 of 7 repos get 403'd
+# in production when searched back-to-back with no delay. GitHub's own
+# guidance is to space Search API requests out; this is deliberately a flat
+# delay rather than a dynamic backoff, since a run only searches a handful of
+# repos once a day and a few extra seconds of latency is irrelevant.
+GITHUB_SEARCH_DELAY_SECONDS = 2.0
+
 
 async def collect_issues(config: PipelineConfig, github_client: GitHubIssuesClient) -> list[Issue]:
     """Search every configured repo, tolerating individual repo failures."""
@@ -35,7 +44,9 @@ async def collect_issues(config: PipelineConfig, github_client: GitHubIssuesClie
     )
 
     issues: list[Issue] = []
-    for repo_config in config.repositories:
+    for i, repo_config in enumerate(config.repositories):
+        if i > 0:
+            await asyncio.sleep(GITHUB_SEARCH_DELAY_SECONDS)
         try:
             repo_issues = await github_client.search_issues(
                 repo_config, config, since_iso, settings.max_issue_body_chars
