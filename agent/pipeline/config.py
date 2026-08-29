@@ -1,8 +1,8 @@
 """Pipeline configuration: the repo watch list, labels, and search terms.
 
-This is fork-specific configuration, not a secret credential, but it still
-must never be committed — a public template repo shouldn't carry any one
-fork's repo list in git history. It's read from the AGENT_PIPELINE_CONFIG
+This is instance-specific configuration, not a secret credential, but it
+still must never be committed — the template repo shouldn't carry any one
+user's repo list in git history. It's read from the AGENT_PIPELINE_CONFIG
 environment variable — in production that's populated from a GitHub Secret
 of the same name; locally, set it in .env. See .env.example for the schema
 to copy from.

@@ -15,7 +15,7 @@ def setup_logging():
 
 
 @pytest.fixture
-def example_fixtures() -> list[dict]:
-    """Load example eval fixtures from JSON."""
-    fixtures_path = Path(__file__).parent / "fixtures" / "example.json"
+def triage_cases() -> list[dict]:
+    """Load the triage eval cases from JSON."""
+    fixtures_path = Path(__file__).parent / "fixtures" / "triage_cases.json"
     return json.loads(fixtures_path.read_text())

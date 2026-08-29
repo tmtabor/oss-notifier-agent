@@ -47,7 +47,7 @@ async def test_agent_rejects_architecture_redesign():
     assert output.is_good_first_issue is False
 
 
-# --- Dataset eval driven by evals/fixtures/example.json ---
+# --- Dataset eval driven by evals/fixtures/triage_cases.json ---
 
 
 @dataclass
@@ -61,8 +61,8 @@ class MatchesExpectedVerdict(Evaluator[str, bool]):
 
 
 @pytest.mark.eval
-async def test_fixture_dataset(example_fixtures: list[dict]):
-    """Run every case in evals/fixtures/example.json through the agent.
+async def test_fixture_dataset(triage_cases: list[dict]):
+    """Run every case in evals/fixtures/triage_cases.json through the agent.
 
     Add cases to that JSON file to grow this eval — no code changes needed
     unless a case requires a new kind of check, in which case add an
@@ -71,12 +71,12 @@ async def test_fixture_dataset(example_fixtures: list[dict]):
     dataset = Dataset(
         cases=[
             Case(
-                name=fixture["name"],
-                inputs=fixture["inputs"]["user_input"],
-                expected_output=fixture.get("expected_output"),
-                metadata=fixture.get("metadata"),
+                name=case["name"],
+                inputs=case["inputs"]["user_input"],
+                expected_output=case.get("expected_output"),
+                metadata=case.get("metadata"),
             )
-            for fixture in example_fixtures
+            for case in triage_cases
         ],
         evaluators=[MatchesExpectedVerdict()],
     )

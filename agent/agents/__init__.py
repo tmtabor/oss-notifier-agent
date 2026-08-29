@@ -1,9 +1,8 @@
-"""Canonical names for the chosen agent pattern.
+"""Canonical names for the triage agent.
 
 tests/ and evals/ import `run_agent`, `AgentOutput`, `AgentDeps`, and `agent`
-from this package rather than from a concrete stub module, so switching
-patterns never requires editing them. The import line below is maintained by
-`scripts/choose_pattern.py` — run it to pick a pattern and delete the others.
+from this package rather than from `agent.agents.single` directly, so the
+concrete module can be reorganized without touching them.
 """
 
 from agent.agents.single import AgentDeps, AgentOutput, agent, run_agent
