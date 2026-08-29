@@ -1,9 +1,10 @@
 [project]
-name = "agent-template"
+name = "oss-notifier-agent"
 version = "0.1.0"
-description = "Opinionated general-purpose AI agent template"
+description = "LLM-triaged good-first-issue digest for GitHub repos, delivered by email."
 license = "BSD-3-Clause"
 requires-python = ">=3.13"
+authors = [{ name = "Thorin Tabor" }]
 dependencies = [
     "pydantic-ai>=2.1.0",
     "pydantic-settings>=2.0",
@@ -12,6 +13,10 @@ dependencies = [
     "httpx>=0.27",
     "pyyaml>=6.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/tmtabor/oss-notifier-agent"
+Repository = "https://github.com/tmtabor/oss-notifier-agent"
 
 [dependency-groups]
 dev = [
@@ -38,7 +43,3 @@ ignore = ["E501"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["agent"]
-# choose_pattern.py writes a combined aliased import ("X as A, Y as B") into
-# agent/agents/__init__.py — without this, isort flags it (I001) after any
-# pattern switch and CI goes red.
-combine-as-imports = true

@@ -1,4 +1,6 @@
-# GitHub Good First Issue Digest
+# OSS Notifier Agent
+
+[![CI](https://github.com/tmtabor/oss-notifier-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/tmtabor/oss-notifier-agent/actions/workflows/ci.yml)
 
 Scans a configured list of GitHub repositories on a schedule, uses an LLM to triage newly opened,
 unassigned issues for whether they're approachable for a first-time contributor, and emails a
@@ -6,9 +8,10 @@ digest of the ones that qualify. Runs entirely on GitHub Actions — no server t
 
 Built on [agent-template](https://github.com/tmtabor/agent-template).
 
-**This repo is public and meant to be forked.** No fork-specific configuration — your repo watch
-list, labels, search terms, or credentials — should ever be committed. Everything you customize
-lives in your fork's own GitHub Secrets; see [Fork this repo](#fork-this-repo) below.
+**This is a GitHub template repository.** Click **Use this template** to create your own copy.
+No instance-specific configuration — your repo watch list, labels, search terms, or credentials —
+should ever be committed. Everything you customize lives in your copy's own GitHub Secrets; see
+[Use this template](#use-this-template) below.
 
 ## Stack
 - Python 3.13, uv
@@ -27,17 +30,18 @@ The LLM only does one thing: classify a single issue as a good first issue
 (`agent/agents/single.py`). Fetching, filtering, and emailing are plain, deterministic Python
 (`agent/pipeline/`) — cheaper, predictable, and fully unit-testable without hitting a real model.
 
-## Fork this repo
+## Use this template
 
-1. **Fork** this repository on GitHub.
+1. Click **Use this template** → **Create a new repository** on GitHub.
 2. **Write your repo watch list** as YAML (schema and examples in `.env.example`), and set it as
    the value of a new **`AGENT_PIPELINE_CONFIG`** secret
    (Settings → Secrets and variables → Actions → New repository secret). This is your watch list —
    it's never committed to git.
 3. **Add the rest of the secrets** listed below. Only the API key secret matching your chosen
    `AGENT_MODEL` provider is required (Google/Gemini by default).
-4. **Trigger the workflow manually** once (Actions → Good First Issue Digest → Run workflow) to
-   confirm an email arrives before trusting the cron schedule.
+4. **Enable and trigger the workflow manually** once (Actions → OSS Notifier Agent → Run workflow)
+   to confirm an email arrives before trusting the cron schedule. GitHub disables scheduled
+   workflows on new repositories created from a template until you enable them.
 
 | Secret | Required | Notes |
 |---|---|---|
@@ -58,7 +62,7 @@ leave it unset.
 The schedule is a `cron:` trigger in `.github/workflows/notify.yml` (default: daily at 14:09 UTC,
 i.e. ~6am Pacific Standard Time — GitHub Actions cron is UTC-only with no DST support, so this
 drifts to ~7am Pacific during Pacific Daylight Time; the `:09` avoids the top-of-hour scheduling
-delay GitHub's own docs warn about) — edit it directly in your fork if you want a different
+delay GitHub's own docs warn about) — edit it directly in your repo if you want a different
 cadence. **`AGENT_SEARCH_WINDOW_HOURS` (default 25h) is not derived from the cron
 schedule** — it's a separate, manually-set value. If you change the cron interval, update
 `AGENT_SEARCH_WINDOW_HOURS` to match (plus a small buffer): too small and issues created between
@@ -70,7 +74,7 @@ runs are silently never searched.
 # Install dependencies
 uv sync --group dev
 
-# After uv sync, install Claude Code skills for pydantic-ai and logfire
+# Optional (Claude Code only): install the pydantic-ai and logfire skills
 uvx library-skills install --all --claude
 
 # Copy and configure environment
@@ -140,9 +144,9 @@ variables directly.
 | `LOGFIRE_TOKEN` | unset | If set, traces go to Logfire cloud. If unset, traces print to the console — no separate dev-mode flag needed. |
 | `AGENT_LOG_LEVEL` | `INFO` | Standard Python logging level. |
 | `GITHUB_TOKEN` | unset | GitHub Search API auth. Provided automatically in Actions; optional (rate-limited) locally. |
-| `AGENT_PIPELINE_CONFIG` | — | Required. YAML repo watch list — see [Fork this repo](#fork-this-repo). |
+| `AGENT_PIPELINE_CONFIG` | — | Required. YAML repo watch list — see [Use this template](#use-this-template). |
 | `POSTMARK_SERVER_TOKEN` / `AGENT_EMAIL_FROM` / `AGENT_EMAIL_TO` | — | Required to actually send the digest email. |
-| `AGENT_SEARCH_WINDOW_HOURS` | `25` | How far back each run searches for newly created issues. Set independently of the cron schedule — see [Fork this repo](#fork-this-repo). |
+| `AGENT_SEARCH_WINDOW_HOURS` | `25` | How far back each run searches for newly created issues. Set independently of the cron schedule — see [Use this template](#use-this-template). |
 | `AGENT_MAX_ISSUE_BODY_CHARS` | `4000` | Issue bodies longer than this are truncated before reaching the LLM. |
 | `AGENT_MAX_ISSUES_PER_RUN` | `30` | Cost guardrail across the whole run, on top of the triage agent's own `USAGE_LIMITS`. |
 
@@ -168,8 +172,8 @@ Configuration above. Each pipeline run is also wrapped in a `digest_run` Logfire
 ## Evals
 
 - Pass/fail evals: `evals/test_pass_fail.py` — includes a `pydantic_evals` Dataset eval driven by
-  `evals/fixtures/example.json` (synthetic issue text, safe to commit). Add cases to that JSON file
-  to grow the eval.
+  `evals/fixtures/triage_cases.json` (synthetic issue text, safe to commit). Add cases to that JSON
+  file to grow the eval.
 - LLM-as-judge evals: `evals/test_llm_judge.py` — graded by `AGENT_JUDGE_MODEL`, checking that
   `reasoning`/`summary` are faithful to the issue content.
 

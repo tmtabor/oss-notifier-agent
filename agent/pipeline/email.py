@@ -50,6 +50,8 @@ class PostmarkClient:
 
         recipients = [addr.strip() for addr in settings.email_to.split(",") if addr.strip()]
         html_body = _render_digest_html(flagged)
+        count = len(flagged)
+        subject = f"OSS Notifier Agent: {count} issue{'' if count == 1 else 's'} found"
 
         response = await self._client.post(
             POSTMARK_URL,
@@ -61,7 +63,7 @@ class PostmarkClient:
             json={
                 "From": settings.email_from,
                 "To": ", ".join(recipients),
-                "Subject": f"OSS Notifier Agent: {len(flagged)} issues found",
+                "Subject": subject,
                 "HtmlBody": html_body,
                 "MessageStream": "outbound",
             },

@@ -8,5 +8,6 @@ __pycache__/
 dist/
 *.egg-info/
 .DS_Store
+.idea/
 logfire_credentials.json
 .claude/settings.local.json
